@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Daily Prayer Timetable </title>
+	<style>
+		body, td, th {font-family: verdana; font-size: 12px; color: #404040;}
+		#timetable {border-width: 1px; border-style: outset; border-collapse: collapse; border-color: gray; width: 9em;}
+		#timetable td, #timetable th {border-width: 1px; border-spacing: 1px; padding: 2px 4px; border-style: inset; border-color: #CCCCCC;}
+		#timetable th {color:black; text-align: center; font-weight: bold; background-color: #F8F7F4;}
+	</style>
+</head>
+<body>
+<script type="text/javascript" src="js/PrayTimes.js"></script>
+<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDY0kkJiTPVd2U7aTOAwhc9ySH6oHxOIYM&sensor=true"></script>
+<script>
+	google.maps.event.addDomListener(window, 'load', getLocation);
+
+	function getLocation(){
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(showPosition);
+		}
+	}
+
+	function showPosition(position) {	
+		initialize(position.coords.latitude, position.coords.longitude)
+		var date = new Date(); // today
+		prayTimes.setMethod('Karachi');
+		var times = prayTimes.getTimes(date, [position.coords.latitude, position.coords.longitude], 'auto');
+		var list = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+
+		var html = '<table id="timetable">';
+		html += '<tr><th colspan="2">'+ date.toLocaleDateString()+ '</th></tr>';
+		for(var i in list)	{
+			html += '<tr><td>'+ list[i]+ '</td>';
+			html += '<td>'+ times[list[i].toLowerCase()]+ '</td></tr>';
+		}
+		html += '</table>';
+		document.getElementById('table').innerHTML = html;
+	}
+	
+	function initialize(latt, longt){
+		var pos = new google.maps.LatLng(latt,longt);
+		var mapProp = { center:pos, zoom:15, mapTypeId:google.maps.MapTypeId.ROADMAP };
+		var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+		var marker=new google.maps.Marker({ position:pos, animation:google.maps.Animation.BOUNCE });
+		marker.setMap(map);
+	}
+</script>
+<br>
+<p align="center">Delhi, New Delhi, India<p>
+<div align="center" id="table"></div><br/>
+<div id="googleMap" style="width:500px;height:380px;"></div>
+</body>
+</html>

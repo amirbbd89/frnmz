@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib>
+	<tlibversion>1.0</tlibversion>
+	<jspversion>1.1</jspversion>
+	<shortname>Header</shortname>
+	
+	<tag>
+		<name>HeaderFooter</name>
+		<tagclass>com.frnmz.taglibs.HeaderFooter</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<info>Tag For Common HeaderFooter</info>
+	</tag>
+	
+	<tag>
+		<name>MemberCombo</name>
+		<tagclass>com.frnmz.taglibs.MemberCombo</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<info>Tag For Common Member Combo</info>
+
+		<attribute>
+			<name>id</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+		<attribute>
+			<name>name</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+		<attribute>
+			<name>userList</name>
+			<type>java.util.List</type>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	
+	<tag>
+		<name>DateCombo</name>
+		<tagclass>com.frnmz.taglibs.DateCombo</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<info>Tag For Common Date Combo</info>
+
+		<attribute>
+			<name>id</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+		<attribute>
+			<name>name</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	
+	<tag>
+		<name>Title</name>
+		<tagclass>com.frnmz.taglibs.PageTitle</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<info>Tag For Common Page Title</info>
+
+		<attribute>
+			<name>pageTitle</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+</taglib>
