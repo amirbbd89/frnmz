@@ -1,2 +1,1 @@
-frnmz
-=====
+Friday Namaz
