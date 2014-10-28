@@ -10,6 +10,8 @@ public class Settings {
 	public static final String DEFAULT_PAGE_TITLE = "LOGIN PAGE";
 	public static final String APP_ADMIN_MAILID = "admin@frnmz.aws.af.cm";
 	public static final String APP_ADMIN_MAILBOX_TITLE = "FRNMZ ADMIN";
+	public static final String APP_FB_URL = "http://www.facebook.com/amirbbd89";
+	public static final String APP_TWITTER_URL = "http://www.twitter.com/amirbbd89";
 	
 	static {
 		if(null == System.getenv("VCAP_SERVICES")){

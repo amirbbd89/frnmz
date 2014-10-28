@@ -27,8 +27,11 @@ public class MongoAuthService implements UserDetailsService {
 				
 				if(userInfo.getAdminAccess()){
 					roles[0] = "AD";
-					return new User(emailId, userInfo.getPassword(), userInfo.getEnabled(), true, true, true, AuthorityUtils.createAuthorityList(roles));
+				} else {
+					roles[0] = "MM";
 				}
+				
+				return new User(emailId, userInfo.getPassword(), userInfo.getEnabled(), true, true, true, AuthorityUtils.createAuthorityList(roles));
 			}
 		} catch (Exception e) {}
 

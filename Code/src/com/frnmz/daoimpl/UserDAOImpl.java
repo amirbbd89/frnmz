@@ -31,7 +31,7 @@ public class UserDAOImpl implements UserDAO{
 	@Override
 	public UserInfo getUserInfo(String emailId, String password) {
 		try {
-				return mongoOperations.findOne(Query.query(Criteria.where("emailId").is(emailId).andOperator(Criteria.where("password").is(password))), UserInfo.class);
+			return mongoOperations.findOne(Query.query(Criteria.where("emailId").is(emailId).andOperator(Criteria.where("password").is(password))), UserInfo.class);
 		} catch (Exception e) {}
 
 		return null;
@@ -74,11 +74,30 @@ public class UserDAOImpl implements UserDAO{
 	public boolean transferAuthority(String newAdminEmailId, String oldAdminEmailId, String newPassword) {
 		try {
 			mongoOperations.findAndModify(Query.query(Criteria.where("emailId").is(oldAdminEmailId)),
-					new Update().set("password", null).set("adminAccess", false), UserInfo.class);
+					new Update().set("adminAccess", false), UserInfo.class);
 			
 			mongoOperations.findAndModify(Query.query(Criteria.where("emailId").is(newAdminEmailId)),
 					new Update().set("password", newPassword).set("adminAccess", true), UserInfo.class);
 			
+			return true;
+		} catch (Exception e) {}
+		return false;
+	}
+
+	@Override
+	public boolean updatePassword(String emailId, String password) {
+		try {
+			mongoOperations.findAndModify(Query.query(Criteria.where("emailId").is(emailId)),
+					new Update().set("password", password), UserInfo.class);			
+			return true;
+		} catch (Exception e) {}
+		return false;
+	}
+
+	@Override
+	public boolean deleteUser(String emailId) {
+		try {
+			mongoOperations.findAndRemove(Query.query(Criteria.where("emailId").is(emailId)), UserInfo.class);			
 			return true;
 		} catch (Exception e) {}
 		return false;

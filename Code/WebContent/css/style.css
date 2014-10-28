@@ -73,8 +73,12 @@ body {
 }
 
 .menu .sub-menu li {
-width:150px;
+width:160px;
 background: #fff;
+}
+
+.menu .sub-menu li:hover {
+background: #f5f5f5;
 }
 
 .menu li {
@@ -113,7 +117,9 @@ background: #fff;
 	display:none;
     position: absolute;
     top: 50px;
-	left: 0
+	left: 0;
+	border-color: #000;
+	border-style: inset;
 }
 
 .menu li:hover .sub-menu {

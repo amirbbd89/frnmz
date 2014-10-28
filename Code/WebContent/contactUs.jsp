@@ -9,7 +9,15 @@
 		<sms:Title pageTitle="Contact Us"/>
 	</head>
 	<body>
-		<sms:HeaderFooter/>
+		<%
+			boolean isLoggedIn = false;
+			if(SecurityContextHolder.getContext().getAuthentication() instanceof UsernamePasswordAuthenticationToken){
+				if(SecurityContextHolder.getContext().getAuthentication().isAuthenticated()){
+					isLoggedIn = true;
+				}
+			}
+		%>
+		<sms:HeaderFooter isLoggedIn="<%=isLoggedIn%>"/>
 		<div id="body">
 			<div class="blog">
 				<div class="sidebar">

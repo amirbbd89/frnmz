@@ -128,8 +128,6 @@ public class AdminController {
 		UserInfo userInfo = initUserInfo(request);
 
 		int balance = 0;
-		List<UserInfo> allUsers = userDao.getAllActiveUsers();
-		List<UserInfo> defaulters = userDao.getAllWhoHaveNotPaid(userInfo.getEmailId());
 		List<Record> allRecords = recordDAO.getAllRecord();
 
 		if(CollectionUtils.isNotEmpty(allRecords)){
@@ -140,11 +138,11 @@ public class AdminController {
 
 		mav.addObject("balance",balance);
 		mav.addObject("recordList",allRecords);
-		mav.addObject("userList", allUsers);
-		mav.addObject("defaulters", defaulters);
-		mav.setViewName("notifications");;
-		mav.addObject("emailId", userInfo.getEmailId());
 
+		if(userInfo.getAdminAccess()){
+			List<UserInfo> defaulters = userDao.getAllWhoHaveNotPaid(userInfo.getEmailId());
+			mav.addObject("defaulters", defaulters);
+		}
 		mav.setViewName("welcome");
 		return mav;
 	}
@@ -379,6 +377,10 @@ public class AdminController {
 		UserInfo userInfo = userDao.getUserInfoByEmail(request.getParameter("emailId").trim());
 
 		if(null != userInfo){
+			if(!userInfo.getEnabled() && userInfo.getPassword() == null){
+				userInfo.setPassword(userInfo.getEmailId());
+			}
+			
 			userInfo.setEnabled(!userInfo.getEnabled());
 			genericDAO.updateObject(userInfo);
 		}
@@ -390,11 +392,7 @@ public class AdminController {
 	@RequestMapping(value="/admin/deleteAccount.htm")
 	public ModelAndView deleteAccount(HttpServletRequest request, HttpServletResponse response){
 		initUserInfo(request);
-		UserInfo userInfo = userDao.getUserInfoByEmail(request.getParameter("emailId").trim());
-
-		if(null != userInfo){
-			genericDAO.deleteObject(userInfo);
-		}
+		boolean bool = userDao.deleteUser(request.getParameter("emailId").trim());
 
 		mav.setViewName("redirect:/admin/onManageUsers.htm");
 		return mav;
@@ -457,6 +455,26 @@ public class AdminController {
 		mav.addObject("msg", "");
 		mav.setViewName("addEditUser");
 		
+		return mav;
+	}
+
+	@RequestMapping(value="/admin/toResetPassword.htm")
+	public ModelAndView toResetPassword(HttpServletRequest request, HttpServletResponse response){
+		UserInfo userInfo = initUserInfo(request);
+		
+		String emailId = request.getParameter("emailId");
+		
+		String newPassword = emailId;
+		boolean bool = userDao.updatePassword(emailId, emailId);
+		
+		if(bool){
+			mav.addObject("msgType", "Success");
+			mav.addObject("msg", "Password reset successfully");
+		}else{
+			mav.addObject("msgType", "Error");
+			mav.addObject("msg", "Error while Authority transfer");
+		}
+		mav.setViewName("redirect:/admin/onLoginSuccess.htm");
 		return mav;
 	}
 	

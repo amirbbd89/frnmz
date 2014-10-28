@@ -49,7 +49,7 @@
 		</script>
 	</head>
 	<body>
-		<sms:HeaderFooter/>
+		<sms:HeaderFooter isLoggedIn="true"/>
 		<div id="body">
 			<div class="blog">
 			<h4 id="msgDiv"></h4>

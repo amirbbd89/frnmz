@@ -16,7 +16,7 @@
 		</script>
 	</head>
 	<body>
-		<sms:HeaderFooter/>
+		<sms:HeaderFooter isLoggedIn="true"/>
 		<div id="body">
 			<div class="blog">
 			<h4 id="msgDiv"></h4>
@@ -43,6 +43,7 @@
 						</c:choose>
 						<c:if test="${user.enabled eq true}">
 							&nbsp;&nbsp;<a href="<%=Settings.APP_CONTEXT%>/admin/toTransferAuthority.htm?emailId=${user.emailId}&name=${user.fullName}"><span class="badge badge-yellow" >Transfer Authority</span></a>
+							&nbsp;&nbsp;<a href="<%=Settings.APP_CONTEXT%>/admin/toResetPassword.htm?emailId=${user.emailId}"><span class="badge badge-yellow" >Reset Password</span></a>
 						</c:if>
 					</c:if>
 					

@@ -9,6 +9,12 @@
 		<tagclass>com.frnmz.taglibs.HeaderFooter</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<info>Tag For Common HeaderFooter</info>
+		<attribute>
+			<name>isLoggedIn</name>
+			<type>java.util.List</type>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
 	</tag>
 	
 	<tag>

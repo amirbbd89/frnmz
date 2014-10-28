@@ -16,7 +16,7 @@ public class Utils {
 			message.append("<br/>Admin Name: <b>"+email+"</b>");
 		}
 		
-		message.append(Settings.APP_HOST_URL+"<br/><br/>This is system generated email.. Please don't reply.");
+		message.append("<br/><br/>"+Settings.APP_HOST_URL+"<br/><br/>This is system generated email.. Please don't reply.");
 		return message.toString();
 	}
 

@@ -1,3 +1,5 @@
+<%@page import="org.springframework.security.authentication.UsernamePasswordAuthenticationToken"%>
+<%@page import="org.springframework.security.core.context.SecurityContextHolder"%>
 <%@page import="com.frnmz.utils.Settings"%>
 <%@ taglib uri="/WEB-INF/tags/frnmz.tld" prefix="sms"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -8,7 +10,15 @@
 		<sms:Title pageTitle="Fund Details"/>
 	</head>
 	<body>
-		<sms:HeaderFooter/>
+		<%
+			boolean isLoggedIn = false;
+			if(SecurityContextHolder.getContext().getAuthentication() instanceof UsernamePasswordAuthenticationToken){
+				if(SecurityContextHolder.getContext().getAuthentication().isAuthenticated()){
+					isLoggedIn = true;
+				}
+			}
+		%>
+		<sms:HeaderFooter isLoggedIn="<%=isLoggedIn%>"/>
 		<div id="body">
 			<div class="blog">
 				<table class="table table-bordered table-striped">
