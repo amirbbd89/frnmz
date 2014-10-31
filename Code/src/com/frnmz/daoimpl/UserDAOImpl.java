@@ -71,13 +71,13 @@ public class UserDAOImpl implements UserDAO{
 	}
 
 	@Override
-	public boolean transferAuthority(String newAdminEmailId, String oldAdminEmailId, String newPassword) {
+	public boolean transferAuthority(String newAdminEmailId, String oldAdminEmailId) {
 		try {
 			mongoOperations.findAndModify(Query.query(Criteria.where("emailId").is(oldAdminEmailId)),
 					new Update().set("adminAccess", false), UserInfo.class);
 			
 			mongoOperations.findAndModify(Query.query(Criteria.where("emailId").is(newAdminEmailId)),
-					new Update().set("password", newPassword).set("adminAccess", true), UserInfo.class);
+					new Update().set("adminAccess", true), UserInfo.class);
 			
 			return true;
 		} catch (Exception e) {}

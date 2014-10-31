@@ -1,8 +1,10 @@
 package com.frnmz.controller;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -10,6 +12,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -17,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.frnmz.dao.GenericDAO;
+import com.frnmz.dao.NotificationDAO;
 import com.frnmz.dao.RecordDAO;
 import com.frnmz.dao.UserDAO;
 import com.frnmz.model.Notification;
@@ -33,6 +44,9 @@ public class AdminController {
 
 	@Autowired
 	private RecordDAO recordDAO;
+
+	@Autowired
+	private NotificationDAO notificationDAO;
 
 	@Autowired
 	private GenericDAO genericDAO;
@@ -77,7 +91,7 @@ public class AdminController {
 		UserInfo userInfo = new UserInfo();
 		String mode = request.getParameter("mode");
 		String editMode = request.getParameter("editMode");
-		
+
 		if("SIGN_UP".equals(mode)){
 			userInfo.setEnabled(false);
 			userInfo.setAdminAccess(false);
@@ -233,7 +247,7 @@ public class AdminController {
 			record.setMemberEmail(nameEmail[1]);
 			member = member.concat(" (").concat(nameEmail[1]).concat(")");
 		}
-		
+
 		boolean success = genericDAO.insertObject(record);
 
 		if(success){
@@ -243,7 +257,7 @@ public class AdminController {
 			balance = recordList.get(0).getBalance();
 			Collections.reverse(recordList);
 			String status = "Friday Namaz Account Update";
-			
+
 			String htmlMessage = Utils.getAccountUpdateMessage(status , amount, balance, member, "By ", recordList);
 			boolean mailSuccess = mailer.sendEmail(userList, "", "", "", status, htmlMessage, null, "");
 
@@ -336,11 +350,11 @@ public class AdminController {
 			String ttg = request.getParameter("ttg");
 			String tol = request.getParameter("tol");
 			String body = Utils.getFridayNotificationMessage(tol, ttg);
-			
+
 			Notification notification = new Notification(subject, body);
-			
+
 			genericDAO.insertObject(notification);
-			
+
 			for(UserInfo user : userList){
 				String hashCode = Utils.getHash(user.getFullName()+" ["+user.getMobileNumber()+"]", "sha1");
 				StringBuffer formBuffer = Utils.getFormBodyString(notification.getId(), user.getFullName()+" ["+user.getMobileNumber()+"]", hashCode);
@@ -380,7 +394,7 @@ public class AdminController {
 			if(!userInfo.getEnabled() && userInfo.getPassword() == null){
 				userInfo.setPassword(userInfo.getEmailId());
 			}
-			
+
 			userInfo.setEnabled(!userInfo.getEnabled());
 			genericDAO.updateObject(userInfo);
 		}
@@ -420,18 +434,17 @@ public class AdminController {
 		String oldAdminEmailId = userInfo.getEmailId();
 		String newAdminName = request.getParameter("name");
 		String newAdminEmailId = request.getParameter("emailId");
-		
-		String newPassword = newAdminEmailId;
-		boolean bool = userDao.transferAuthority(newAdminEmailId, oldAdminEmailId, newPassword );
-		
+
+		boolean bool = userDao.transferAuthority(newAdminEmailId, oldAdminEmailId);
+
 		if(bool){
-			String message = Utils.getMessage("Congrats now you are Admin", newAdminEmailId, newPassword);
+			String message = Utils.getMessage("Congrats now you are Group Admin", newAdminEmailId, "Use your current password");
 			mailer.sendEmail(newAdminEmailId, "", "", "", "Friday Namaz | Group Admin Changed", message, null, "");
-			
+
 			List<UserInfo> userList = userDao.getAllUsers();
-			message = Utils.getMessage("We have a new group admin from today", newAdminName+" ("+newAdminEmailId+")", null);
+			message = Utils.getMessage("Group Admin Changed", newAdminName+" ("+newAdminEmailId+")", null);
 			mailer.sendEmail(userList, "", "", "", "Friday Namaz | Group Admin Changed", message, null, "");
-			
+
 			mav.addObject("msgType", "Success");
 			mav.addObject("msg", "Authority transferred");
 			mav.setViewName("redirect:/j_spring_security_logout");
@@ -446,27 +459,27 @@ public class AdminController {
 	@RequestMapping(value="/admin/editAccount.htm")
 	public ModelAndView editAccount(HttpServletRequest request, HttpServletResponse response){
 		initUserInfo(request);
-		
+
 		UserInfo userInfo = userDao.getUserInfoByEmail(request.getParameter("emailId"));
-		
+
 		request.setAttribute("mode", "EDIT_PROFILE");
 		request.setAttribute("editMode", "MM");
 		request.setAttribute("USER_INFO", userInfo);
 		mav.addObject("msg", "");
 		mav.setViewName("addEditUser");
-		
+
 		return mav;
 	}
 
 	@RequestMapping(value="/admin/toResetPassword.htm")
 	public ModelAndView toResetPassword(HttpServletRequest request, HttpServletResponse response){
 		UserInfo userInfo = initUserInfo(request);
-		
+
 		String emailId = request.getParameter("emailId");
-		
+
 		String newPassword = emailId;
 		boolean bool = userDao.updatePassword(emailId, emailId);
-		
+
 		if(bool){
 			mav.addObject("msgType", "Success");
 			mav.addObject("msg", "Password reset successfully");
@@ -477,7 +490,124 @@ public class AdminController {
 		mav.setViewName("redirect:/admin/onLoginSuccess.htm");
 		return mav;
 	}
-	
+
+	@RequestMapping(value="/admin/toImportExport.htm")
+	public ModelAndView toImportExport(HttpServletRequest request, HttpServletResponse response){
+		UserInfo userInfo = initUserInfo(request);
+		mav.setViewName("importexport");
+		return mav;
+	}
+
+	@RequestMapping(value="/admin/onExcelExport.htm")
+	public void onExcelExport(HttpServletRequest request, HttpServletResponse response){
+		response.setContentType("application/vnd.ms-excel");
+		response.setHeader("Content-Disposition", "attachment; filename=data_backup_"+System.currentTimeMillis()+".xls");
+
+		List<UserInfo> userList = userDao.getAllUsers();
+		List<Record> recordList = recordDAO.getAllRecord();
+		List<Notification> notificationList = notificationDAO.getAllNotifications();
+
+		try {
+			Workbook wb = new HSSFWorkbook();
+
+			Sheet usersheet = wb.createSheet("users");
+			int i = 0;
+			for(UserInfo userInfo : userList){
+				Row row = usersheet.createRow(i++);
+
+				row.createCell(0).setCellValue(userInfo.getEmailId());
+				row.createCell(1).setCellValue(userInfo.getFullName());
+				row.createCell(2).setCellValue(userInfo.getMobileNumber());
+				row.createCell(3).setCellValue(userInfo.getPassword());
+				row.createCell(4).setCellValue(userInfo.getEnabled());
+				row.createCell(5).setCellValue(userInfo.getAdminAccess());
+			}
+
+			Sheet recordsheet = wb.createSheet("record");
+			i = 0;
+			for(Record record : recordList){
+				Row row = recordsheet.createRow(i++);
+
+				row.createCell(0).setCellValue(record.getAdminEmail());
+				row.createCell(1).setCellValue(record.getCreditDebit());
+				row.createCell(2).setCellValue(record.getMemberEmail());
+				row.createCell(3).setCellValue(record.getMemberName());
+				row.createCell(4).setCellValue(record.getTransactionDate());
+				row.createCell(5).setCellValue(record.getTransactionAmount());
+				row.createCell(6).setCellValue(record.getBalance());
+			}
+
+			wb.write(response.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@RequestMapping(value="/admin/onExcelImport.htm")
+	public ModelAndView onExcelImport(HttpServletRequest request, HttpServletResponse response){
+		UserInfo userInfo = initUserInfo(request);
+
+		try {
+			List<FileItem> fileList = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
+
+			for(FileItem fileItem: fileList){
+				if(!fileItem.isFormField()){
+					Workbook wb = new HSSFWorkbook(fileItem.getInputStream());
+					
+					if(wb.getNumberOfSheets() == 2){
+						Sheet usersheet = wb.getSheet("users");
+						Sheet recordsheet = wb.getSheet("record");
+						
+						Iterator<Row> userIt = usersheet.rowIterator();
+						while(userIt.hasNext()){
+							Row row = userIt.next();
+							UserInfo user = new UserInfo();
+							
+							user.setEmailId(row.getCell(0).getStringCellValue());
+							user.setFullName(row.getCell(1).getStringCellValue());
+							user.setMobileNumber(row.getCell(2).getStringCellValue());
+							user.setPassword(row.getCell(3).getStringCellValue());
+							user.setEnabled(row.getCell(4).getBooleanCellValue());
+							user.setAdminAccess(row.getCell(5).getBooleanCellValue());
+							
+							if(user.getEmailId().equals(userInfo.getEmailId())){
+								genericDAO.deleteObject(userInfo);
+							}
+							genericDAO.insertObject(user);
+						}
+						
+						Iterator<Row> recordIt = recordsheet.rowIterator();
+						while(recordIt.hasNext()){
+							Row row = recordIt.next();
+							Record record = new Record();
+							
+							record.setAdminEmail(row.getCell(0).getStringCellValue());
+							record.setCreditDebit(row.getCell(1).getStringCellValue());
+							record.setMemberEmail(row.getCell(2).getStringCellValue());
+							record.setMemberName(row.getCell(3).getStringCellValue());
+							record.setTransactionDate(row.getCell(4).getDateCellValue());
+							record.setTransactionAmount((int)row.getCell(5).getNumericCellValue());
+							record.setBalance((int)row.getCell(6).getNumericCellValue());
+							
+							
+							System.out.println(row.getCell(4).getDateCellValue().toGMTString());
+							genericDAO.insertObject(record);
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		mav.addObject("msgType", "Success");
+		mav.addObject("msg", "Imported successfully");
+
+		mav.setViewName("importexport");
+		return mav;
+	}
+
 	@PostConstruct
 	public void addAdminUserIfNotExist(){
 		if(userDao.getAllActiveUsers().isEmpty()){

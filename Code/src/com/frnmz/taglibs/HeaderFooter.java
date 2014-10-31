@@ -36,7 +36,8 @@ public class HeaderFooter extends TagSupport {
 
     			htmlTextBuffer.append("<li><a href=\"#\">Account</a><ul class=\"sub-menu\">");
     			htmlTextBuffer.append("<li><a href=\""+Settings.APP_CONTEXT+"/admin/toCreditDebit.htm?action=CREDIT\">Add Contribution</a></li>");
-    			htmlTextBuffer.append("<li><a href=\""+Settings.APP_CONTEXT+"/admin/toCreditDebit.htm?action=DEBIT\">Cab Payment</a></li></ul></li>&nbsp;");
+    			htmlTextBuffer.append("<li><a href=\""+Settings.APP_CONTEXT+"/admin/toCreditDebit.htm?action=DEBIT\">Cab Payment</a></li>");
+    			htmlTextBuffer.append("<li><a href=\""+Settings.APP_CONTEXT+"/admin/toImportExport.htm\">Import/Export</a></li></ul></li>&nbsp;");
     		} else {
     			htmlTextBuffer.append("<li><a href=\""+Settings.APP_CONTEXT+"/guest/toViewMembers.htm\">Members</a></li>&nbsp;");
     		}
