@@ -152,11 +152,6 @@ public class AdminController {
 
 		mav.addObject("balance",balance);
 		mav.addObject("recordList",allRecords);
-
-		if(userInfo.getAdminAccess()){
-			List<UserInfo> defaulters = userDao.getAllWhoHaveNotPaid(userInfo.getEmailId());
-			mav.addObject("defaulters", defaulters);
-		}
 		mav.setViewName("welcome");
 		return mav;
 	}
@@ -327,8 +322,6 @@ public class AdminController {
 		List<UserInfo> userList;
 		if(null != request.getParameter("toAll") && "on".equals(request.getParameter("toAll"))){
 			userList = userDao.getAllUsers();
-		} else if(null != request.getParameter("toOnlyDefaulter") && "on".equals(request.getParameter("toOnlyDefaulter"))) {
-			userList = userDao.getAllWhoHaveNotPaid(userInfo.getEmailId());
 		} else {
 			userList = userDao.getAllActiveUsers();
 		}

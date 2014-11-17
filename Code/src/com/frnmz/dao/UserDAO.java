@@ -9,7 +9,6 @@ public interface UserDAO {
 	public UserInfo getUserInfo(String username, String password);
 	public List<UserInfo> getAllActiveUsers();
 	public List<UserInfo> getAllUsers();
-	public List<UserInfo> getAllWhoHaveNotPaid(String email);
 	public boolean transferAuthority(String newAdminEmailId, String oldAdminEmailId);
 	public boolean updatePassword(String emailId, String password);
 	public boolean deleteUser(String emailId);

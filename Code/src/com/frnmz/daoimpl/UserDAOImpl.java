@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import com.frnmz.dao.UserDAO;
-import com.frnmz.model.Record;
 import com.frnmz.model.UserInfo;
 
 @Service
@@ -53,21 +52,6 @@ public class UserDAOImpl implements UserDAO{
 		} catch (Exception e) {}
 
 		return new ArrayList<UserInfo>();
-	}
-
-	@Override
-	public List<UserInfo> getAllWhoHaveNotPaid(String emailId) {
-		List<UserInfo> activeUserList = mongoOperations.find(new Query(Criteria.where("enabled").is(true)), UserInfo.class);
-		List<Record> allRecords = mongoOperations.find(Query.query(Criteria.where("adminEmail").is(emailId)) ,Record.class);
-		
-		for(Record record : allRecords){
-			UserInfo uiTemp = new UserInfo(record.getMemberEmail());
-			if(uiTemp.getEmailId() != null && activeUserList.contains(uiTemp)){
-				activeUserList.remove(activeUserList.indexOf(uiTemp));
-			}
-		}
-		
-		return activeUserList;
 	}
 
 	@Override

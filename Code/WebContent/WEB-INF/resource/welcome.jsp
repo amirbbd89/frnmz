@@ -81,20 +81,12 @@
 								<table>
 									<tr><th align="right">A/C Number</th><th><input type="text" id="accNo" name="accNo"></th></tr>
 									<tr><th align="right">City</th><th><input type="text" id="city" name="city"></th></tr>
-									<tr><th></th><th><input type="checkbox" name="toOnlyDefaulter" id="toOnlyDefaulter">Only Defaulters</th></tr>
+									<tr><th></th><th><input type="checkbox" name="toAll" id="toAll">All Member</th></tr>
 									<tr><th></th><th><input type="submit" value="Send Contribution Request" onclick="return validateForm2()"></th></tr>
 								</table>
 							</form>
 						</li></ul>
 					</div>
-					
-					<table class="table table-bordered table-striped">
-						<tr><th colspan="3">Defaulter</th></tr>
-						<tr><th>Name</th><th>EmailId</th><th>Mobile Number</th></tr>
-						<c:forEach var="user" items="${defaulters}">
-						<tr><td>${user.fullName}</td><td>${user.emailId}</td><td>${user.mobileNumber}</td></tr>
-						</c:forEach>
-					</table>
 				</c:if>
 				
 				<table class="table table-bordered table-striped">
