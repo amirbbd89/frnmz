@@ -559,7 +559,13 @@ public class AdminController {
 							user.setEmailId(row.getCell(0).getStringCellValue());
 							user.setFullName(row.getCell(1).getStringCellValue());
 							user.setMobileNumber(row.getCell(2).getStringCellValue());
-							user.setPassword(row.getCell(3).getStringCellValue());
+							
+							if(row.getCell(3) != null){
+								user.setPassword(row.getCell(3).getStringCellValue());
+							} else {
+								user.setPassword(null);
+							}
+							
 							user.setEnabled(row.getCell(4).getBooleanCellValue());
 							user.setAdminAccess(row.getCell(5).getBooleanCellValue());
 							
@@ -576,7 +582,13 @@ public class AdminController {
 							
 							record.setAdminEmail(row.getCell(0).getStringCellValue());
 							record.setCreditDebit(row.getCell(1).getStringCellValue());
-							record.setMemberEmail(row.getCell(2).getStringCellValue());
+							
+							if(row.getCell(2) != null){
+								record.setMemberEmail(row.getCell(2).getStringCellValue());
+							} else {
+								record.setMemberEmail("");
+							}
+							
 							record.setMemberName(row.getCell(3).getStringCellValue());
 							record.setTransactionDate(row.getCell(4).getDateCellValue());
 							record.setTransactionAmount((int)row.getCell(5).getNumericCellValue());
@@ -590,7 +602,6 @@ public class AdminController {
 				}
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
