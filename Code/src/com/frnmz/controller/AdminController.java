@@ -57,6 +57,7 @@ public class AdminController {
 	private ModelAndView mav;
 	public AdminController(){
 		mav = new ModelAndView();
+		mav = new ModelAndView();
 	}
 
 	private UserInfo initUserInfo(HttpServletRequest request){
