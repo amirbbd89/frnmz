@@ -1,1 +1,1 @@
-Friday Namaz
+frnmz Fund Management
